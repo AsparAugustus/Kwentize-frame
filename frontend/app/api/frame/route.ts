@@ -89,7 +89,7 @@ function getResponse(type: ResponseType) {
         image: {
           src: `${user.pfp_url}`,
         },
-        postUrl: `${NEXT_API_URL}/api/frame`,
+        postUrl: `${NEXT_API_URL}`,
       }),
     );
 
