@@ -175,14 +175,24 @@ def remove_and_overlay():
         content_type = request.headers.get("Content-Type")
         if content_type == "application/json":
             json_data = request.json
+            username = json_data.get("username")
+            address = json_data.get("address")
+            if not (username and address):
+                return jsonify({"error": "Username and address must be provided"}), 400
+
             now = str(time.time())
             url = json_data["url"]
             data = requests.get(url).content
             file_extension = url.split(".")[-1]  # Extract file extension from URL
             input_path = f"./origin/{now}.{file_extension}"
 
+            background_image_filename = f"background_{now}.{file_extension}"
+            background_image_path = os.path.join("static", background_image_filename)
+            with open(background_image_path, "wb") as f:
+                f.write(data)
+
             # Remove background from the provided image
-            background_removed_image_bytes = remove_background_from_image(data)
+            background_removed_image_bytes = remove_background_from_image(background_image_path)
 
             if background_removed_image_bytes is None:
                 return jsonify({"error": "Failed to remove background from image"}), 500
