@@ -269,12 +269,10 @@ def overlay_images(foreground_image_bytes, background_path="assets/frame_img.png
         # Paste the foreground image onto the background
         background.paste(foreground, (x, y), foreground)
 
-        # Save the result to a BytesIO object
-        output = BytesIO()
-        background.save(output, format='PNG')
-        output.seek(0)
-
-        return output.getvalue()
+        # Return the resulting image bytes
+        with BytesIO() as output_buffer:
+            background.save(output_buffer, format='PNG')
+            return output_buffer.getvalue()
 
     except Exception as e:
         print(f"Error: {e}")
