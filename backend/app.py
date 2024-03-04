@@ -245,6 +245,8 @@ def remove_background_from_image(foreground_image_bytes):
         with open(output_path, "rb") as f:
             result_image_bytes = f.read()
 
+        os.remove(output_path)
+
         return result_image_bytes
 
     except Exception as e:
