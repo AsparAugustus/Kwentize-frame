@@ -54,7 +54,32 @@ export async function POST(req: NextRequest): Promise<Response> {
 
 
 
-  return getResponse(ResponseType.SUCCESS);
+  // return getResponse(ResponseType.SUCCESS);
+
+  const encodedCustodyAddress = user.custody_address !== null ? encodeURIComponent(user.custody_address) : "";
+  const encodedUsername = user.username !== null ? encodeURIComponent(user.username) : "";
+  const encodedPfpUrl = user.pfp_url !== null ? encodeURIComponent(user.pfp_url) : "";
+  const postUrl = `${NEXT_PUBLIC_URL}/api/frame?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
+
+  return new NextResponse(
+    getFrameHtmlResponse({
+      buttons: [
+        {
+          label: `${user.custody_address}`,
+        },
+        {
+          label: `${user.display_name}`,
+        },
+        {
+          label: `${user.username}`,
+        }
+      ],
+      image: {
+        src: `${user.pfp_url}`,
+      },
+      postUrl: `${postUrl}`,
+    }),
+  );
 
 }
 
@@ -73,6 +98,8 @@ function getResponse(type: ResponseType) {
 
     console.log(IMAGE)
 
+  
+
     return new NextResponse(
       getFrameHtmlResponse({
         buttons: [
@@ -89,7 +116,7 @@ function getResponse(type: ResponseType) {
         image: {
           src: `${user.pfp_url}`,
         },
-        postUrl: `${NEXT_API_URL}`,
+        postUrl: `${NEXT_API_URL}/api/frame`,
       }),
     );
 
