@@ -182,9 +182,14 @@ def remove_and_overlay():
 
             now = str(time.time())
             url = json_data["url"]
-            data = requests.get(url).content
-            file_extension = url.split(".")[-1]  # Extract file extension from URL
+            file_extension = "png"
             input_path = f"./origin/{now}.{file_extension}"
+            output_path = f"./static/{now}.png"  # Output always as PNG
+
+
+            data = requests.get(url).content
+            
+
 
             background_image_filename = f"background_{now}.{file_extension}"
             background_image_path = os.path.join("static", background_image_filename)
@@ -192,7 +197,7 @@ def remove_and_overlay():
                 f.write(data)
 
             # Remove background from the provided image
-            background_removed_image_bytes = remove_background_from_image(background_image_path)
+            background_removed_image_bytes = remove_background_from_image(data)
 
             if background_removed_image_bytes is None:
                 return jsonify({"error": "Failed to remove background from image"}), 500
@@ -228,6 +233,9 @@ def remove_background_from_image(foreground_image_bytes):
                 session = new_session(model_name)
                 output_image_bytes = remove(input_image_bytes, session=session)
                 o.write(output_image_bytes)
+        
+        # Delete the input file after processing
+        os.remove(input_path)
 
         # Read the resulting image bytes
         with open(output_path, "rb") as f:
