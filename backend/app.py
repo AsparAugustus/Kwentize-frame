@@ -184,7 +184,7 @@ def remove_and_overlay():
             url = json_data["url"]
             file_extension = "png"
             input_path = f"./origin/{now}.{file_extension}"
-            output_path = f"./static/{now}.png"  # Output always as PNG
+            output_path = f"./static/{username}_{address}_{now}.png"  # Output always as PNG
 
 
             data = requests.get(url).content
@@ -198,12 +198,16 @@ def remove_and_overlay():
 
             # Remove background from the provided image
             background_removed_image_bytes = remove_background_from_image(data)
+            os.remove(background_image_path)
 
             if background_removed_image_bytes is None:
                 return jsonify({"error": "Failed to remove background from image"}), 500
 
             # Overlay the background removed image on top of a background
             result_image_bytes = overlay_images(background_removed_image_bytes)
+
+            with open(output_path, "wb") as f:
+                f.write(result_image_bytes)
 
             if result_image_bytes is None:
                 return jsonify({"error": "Failed to overlay images"}), 500
