@@ -258,16 +258,3 @@ def overlay_images(foreground_image_bytes, background_path="assets/frame_img.png
         print(f"Error: {e}")
         return None
     
-
-if __name__ == "__main__":
-    import socket
-
-    # Get hostname and port
-    hostname = socket.gethostname()
-    port = app.run.port  # Access the port attribute from the app.run context
-
-    # Format the message
-    message = f"Flask is running at http://{hostname}:{port}"
-
-    # Print the message
-    print(message)
