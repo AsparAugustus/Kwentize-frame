@@ -270,6 +270,8 @@ def fetch_image(webpage_url):
             # Process the image data as needed
             print("Data Length:", len(data))
 
+            return data
+
     except requests.exceptions.RequestException as e:
         print("Error fetching webpage:", e)
     except Exception as e:
