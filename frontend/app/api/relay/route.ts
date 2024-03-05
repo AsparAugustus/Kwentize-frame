@@ -1,6 +1,6 @@
 import { FrameRequest, getFrameMessage, getFrameHtmlResponse } from '@coinbase/onchainkit/frame';
 import { NextRequest, NextResponse } from 'next/server';
-import { NEXT_PUBLIC_URL, NEXT_API_URL } from '../../config';
+import { NEXT_PUBLIC_URL, NEXT_API_URL, NEXT_API_URL_WITHOUTPORT } from '../../config';
 import { NeynarAPIClient, isApiErrorResponse } from "@neynar/nodejs-sdk";
 import axios from "axios";
 
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         }
       ],
       image: {
-        src: `${NEXT_PUBLIC_URL}/static/filename`,
+        src: `${NEXT_API_URL_WITHOUTPORT}/static/filename`,
       },
       postUrl: `${NEXT_API_URL}/download_file$username=${encodedUsername}`,
     }),
