@@ -4,7 +4,8 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 from urllib.parse import unquote
-import urllib.request
+from bs4 import BeautifulSoup
+import re
 
 import requests
 import time
@@ -204,18 +205,7 @@ def remove_and_overlay():
         # except requests.exceptions.RequestException as e:
         #     print("Error fetching image:", e)
 
-        try:
-            # Fetch the image data using urllib
-            with urllib.request.urlopen(pfp_url) as response:
-                data = response.read()
-                print("Data Length:", len(data))
-
-                # Continue processing the image data...
-                
-        except urllib.error.HTTPError as e:
-            print("Error fetching image:", e)
-        except Exception as e:
-            print("An error occurred:", e)
+        data = fetch_image(pfp_url)
 
         print("Data Length:", len(data))
 
@@ -249,6 +239,38 @@ def remove_and_overlay():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+def fetch_image(webpage_url):
+    try:
+        # Fetch the HTML content of the webpage
+        response = requests.get(webpage_url)
+        html_content = response.text
+
+        # Parse the HTML content using Beautiful Soup
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        # Find all <img> tags
+        img_tags = soup.find_all('img')
+
+        # Extract the source URLs of the images
+        image_urls = [img['src'] for img in img_tags if 'src' in img.attrs]
+
+        # Filter out non-image URLs (optional)
+        image_urls = [url for url in image_urls if re.match(r'^https?://', url)]
+
+        # Fetch the image data for each URL
+        for image_url in image_urls:
+            response = requests.get(image_url)
+            data = response.content
+
+            # Process the image data as needed
+            print("Data Length:", len(data))
+
+    except requests.exceptions.RequestException as e:
+        print("Error fetching webpage:", e)
+    except Exception as e:
+        print("An error occurred:", e)
 
     
 
