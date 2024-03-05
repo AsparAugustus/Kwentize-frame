@@ -61,25 +61,20 @@ export async function POST(req: NextRequest): Promise<Response> {
   const encodedCustodyAddress = user.custody_address !== null ? encodeURIComponent(user.custody_address) : "";
   const encodedUsername = user.username !== null ? encodeURIComponent(user.username) : "";
   const encodedPfpUrl = user.pfp_url !== null ? encodeURIComponent(user.pfp_url) : "";
-  const postUrl = `${NEXT_API_URL}/api/frame?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
+  const postUrl = `${NEXT_API_URL}/remove_and_overlay?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
+
 
   return new NextResponse(
     getFrameHtmlResponse({
       buttons: [
         {
-          label: `${user.custody_address}`,
-        },
-        {
-          label: `${user.display_name}`,
-        },
-        {
-          label: `${user.username}`,
+          label: `Start conversion`,
         }
       ],
       image: {
         src: `${user.pfp_url}`,
       },
-      postUrl: `${postUrl}`,
+      postUrl: `${NEXT_PUBLIC_URL}/generate`,
     }),
   );
 

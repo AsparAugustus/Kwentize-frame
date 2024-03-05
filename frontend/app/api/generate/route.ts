@@ -59,7 +59,32 @@ export async function POST(req: NextRequest): Promise<Response> {
   const encodedCustodyAddress = user.custody_address !== null ? encodeURIComponent(user.custody_address) : "";
   const encodedUsername = user.username !== null ? encodeURIComponent(user.username) : "";
   const encodedPfpUrl = user.pfp_url !== null ? encodeURIComponent(user.pfp_url) : "";
-  const postUrl = `${NEXT_API_URL}/api/frame?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
+  const postUrl = `${NEXT_API_URL}/remove_and_overlay?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
+
+
+
+  // First POST request to fetch the file content and get the filename
+    let filename;
+    axios.post(postUrl)
+    .then(response => {
+    // Check if the response is successful
+    if (response.status === 200) {
+        // Extract the filename from the response
+        filename = response.data.filename;
+
+        // Log the filename
+        console.log('Filename:', filename);
+    } else {
+        // Handle error responses for the first request
+        console.error('Download request failed:', response.statusText);
+    }
+    })
+    .catch(error => {
+    // Handle Axios errors for the first request
+    console.error('Axios error:', error);
+    });
+
+
 
   return new NextResponse(
     getFrameHtmlResponse({
@@ -71,7 +96,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       image: {
         src: `${user.pfp_url}`,
       },
-      postUrl: `${postUrl}`,
+      postUrl: `${NEXT_API_URL}/static/${filename}`,
     }),
   );
 
