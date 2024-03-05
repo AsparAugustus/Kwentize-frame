@@ -190,6 +190,10 @@ def remove_and_overlay():
 
         now = str(time.time())
 
+
+        # Fetch existing files in the static directory
+        static_folder_path = os.path.join(os.getcwd(), 'static')
+        existing_files = os.listdir(static_folder_path)
         # Filter files matching the username and address
         matching_files = [file for file in existing_files if file.startswith(f"{username}_{address}")]
 
