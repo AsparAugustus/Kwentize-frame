@@ -171,9 +171,7 @@ def overlay():
 
 @app.route("/remove_and_overlay", methods=["POST"])
 def remove_and_overlay():
-
     try:
- 
         address_encoded = request.args.get("custody_address")
         username_encoded = request.args.get("username")
         pfp_url_encoded = request.args.get("pfp_url")
@@ -181,6 +179,10 @@ def remove_and_overlay():
         address = unquote(address_encoded)
         username = unquote(username_encoded)
         pfp_url = unquote(pfp_url_encoded)
+
+        print("Address:", address)
+        print("Username:", username)
+        print("PFP URL:", pfp_url)
 
         if not (username and address):
             return jsonify({"error": "Username and address must be provided"}), 400
@@ -191,10 +193,12 @@ def remove_and_overlay():
         input_path = f"./origin/{now}.{file_extension}"
         output_path = f"./static/{username}_{address}_{now}.png"  # Output always as PNG
 
+        print("Input Path:", input_path)
+        print("Output Path:", output_path)
 
         data = requests.get(pfp_url).content
-        
 
+        print("Data Length:", len(data))
 
         background_image_filename = f"background_{now}.{file_extension}"
         background_image_path = os.path.join("static", background_image_filename)
@@ -225,6 +229,7 @@ def remove_and_overlay():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
     
 
 @app.route("/download_file", methods=["POST"])
