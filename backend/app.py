@@ -220,6 +220,32 @@ def remove_and_overlay():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@app.route("/download_file", methods=["POST"])
+def download_file():
+    try:
+        # Get the filename from the POST request data
+        filename = request.json.get("filename")
+
+        # Check if the filename exists
+        if filename:
+            # Get the full path of the file within the static folder
+            static_folder_path = os.path.join(os.getcwd(), 'static')  # Assuming the static folder is in the current working directory
+            file_path = os.path.join(static_folder_path, filename)
+
+            # Check if the file exists
+            if os.path.exists(file_path):
+                # Return the file for download
+                return send_file(file_path, as_attachment=True)
+            else:
+                return jsonify({"error": "File not found"}), 404
+        else:
+            return jsonify({"error": "Filename not provided"}), 400
+
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 def remove_background_from_image(foreground_image_bytes):
     try:
