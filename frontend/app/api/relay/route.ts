@@ -98,7 +98,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       image: {
         src: `${NEXT_API_URL_WITHOUTPORT}/static/filename`,
       },
-      postUrl: `${NEXT_API_URL}/download_file$username=${encodedUsername}`,
+      postUrl: `${NEXT_API_URL_WITHOUTPORT}/static/filename`,
     }),
   );
 
