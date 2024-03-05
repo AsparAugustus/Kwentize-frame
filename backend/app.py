@@ -256,9 +256,9 @@ def fetch_image(webpage_url):
     # Check if the request was successful (status code 200)
     if response.status_code == 200:
         # Save the content of the response (the image) to a file
-        with open('image.png', 'wb') as f:
-            f.write(response.content)
         print("Image downloaded successfully.")
+        return response.content
+
     else:
         print("Failed to download the image. Status code:", response.status_code)
 
