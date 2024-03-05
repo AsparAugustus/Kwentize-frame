@@ -265,28 +265,41 @@ def fetch_image(webpage_url):
     else:
         print("Failed to download the image. Status code:", response.status_code)
 
+
+
+
 @app.route("/download_file", methods=["POST"])
 def download_file():
     try:
-        # Get the filename from the POST request data
-        filename = request.json.get("filename")
+        # Get the username from the POST request data
+        username_encoded = request.args.get("username")
+        username = unquote(username_encoded)
 
-        # Check if the filename exists
-        if filename:
-            # Get the full path of the file within the static folder
-            static_folder_path = os.path.join(os.getcwd(), 'static')  # Assuming the static folder is in the current working directory
-            file_path = os.path.join(static_folder_path, filename)
+        # Check if the username exists
+        if username:
+            # Get the static folder path
+            static_folder_path = os.path.join(os.getcwd(), 'static')
 
-            # Check if the file exists
-            if os.path.exists(file_path):
+            # Find files starting with the username
+            matching_files = [file for file in os.listdir(static_folder_path) if file.startswith(username + '_')]
+
+            # Sort the files by timestamp
+            sorted_files = sorted(matching_files, key=lambda x: float(x.split('_')[-1].split('.')[0]), reverse=True)
+
+            # Check if any files matched the criteria
+            if sorted_files:
+                # Get the latest file
+                latest_file = sorted_files[0]
+
+                # Get the full path of the file
+                file_path = os.path.join(static_folder_path, latest_file)
+
                 # Return the file for download
                 return send_file(file_path, as_attachment=True)
             else:
-                return jsonify({"error": "File not found"}), 404
+                return jsonify({"error": f"No files found for username '{username}'"}), 404
         else:
-            return jsonify({"error": "Filename not provided"}), 400
-
-
+            return jsonify({"error": "Username not provided"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

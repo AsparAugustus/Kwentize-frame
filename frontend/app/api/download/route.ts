@@ -65,40 +65,18 @@ export async function POST(req: NextRequest): Promise<Response> {
   const postUrl = `${NEXT_API_URL}/remove_and_overlay?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
 
 
-    // First POST request to fetch the file content and get the filename
-    let filename;
-    axios.post(postUrl)
-    .then(response => {
-    // Check if the response is successful
-    if (response.status === 200) {
-        // Extract the filename from the response
-        filename = response.data.filename;
-
-        // Log the filename
-        console.log('Filename:', filename);
-    } else {
-        // Handle error responses for the first request
-        console.error('Download request failed:', response.statusText);
-    }
-    })
-    .catch(error => {
-    // Handle Axios errors for the first request
-    console.error('Axios error:', error);
-    });
-
-    console.log(filename)
 
   return new NextResponse(
     getFrameHtmlResponse({
       buttons: [
         {
-          label: `Go to download`,
+          label: `Click to download PFP`,
         }
       ],
       image: {
         src: `${NEXT_PUBLIC_URL}/kwentize.png`,
       },
-      postUrl: `${NEXT_PUBLIC_URL}/api/download`,
+      postUrl: `${NEXT_API_URL}/download_file$username=${encodedUsername}`,
     }),
   );
 
