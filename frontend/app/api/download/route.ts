@@ -71,7 +71,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       buttons: [
         {
           action: 'link',
-          label: `Click to download PFP`,
+          label: `asdasds`,
           target: `${NEXT_API_URL}/download_file$username=${encodedUsername}`
         }
       ],

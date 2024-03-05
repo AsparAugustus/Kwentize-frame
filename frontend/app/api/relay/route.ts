@@ -92,6 +92,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     getFrameHtmlResponse({
       buttons: [
         {
+          action: 'link',
           label: `Click to download PFP`,
           target: `${NEXT_API_URL}/static/${filename}`
         }
