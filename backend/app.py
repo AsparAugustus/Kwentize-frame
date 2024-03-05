@@ -204,8 +204,11 @@ def remove_and_overlay():
         #     data = response.content
         # except requests.exceptions.RequestException as e:
         #     print("Error fetching image:", e)
+        try:
 
-        data = fetch_image(pfp_url)
+            data = fetch_image(pfp_url)
+        except Exception as e:
+            print("Error fetching image:", e)
 
         print("Data Length:", len(data))
 
