@@ -196,7 +196,9 @@ def remove_and_overlay():
         print("Input Path:", input_path)
         print("Output Path:", output_path)
 
-        data = requests.get(pfp_url).content
+        response = requests.get(pfp_url)
+        response.raise_for_status()  # Raise an error for bad status codes
+        data = response.content
 
         print("Data Length:", len(data))
 
