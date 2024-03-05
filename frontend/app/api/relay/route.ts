@@ -67,7 +67,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     // First POST request to fetch the file content and get the filename
     let filename;
-    axios.post(postUrl)
+    await axios.post(postUrl)
     .then(response => {
     // Check if the response is successful
     if (response.status === 200) {
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         }
       ],
       image: {
-        src: `${NEXT_PUBLIC_URL}/kwentize.png`,
+        src: `${NEXT_PUBLIC_URL}/static/filename`,
       },
       postUrl: `${NEXT_API_URL}/download_file$username=${encodedUsername}`,
     }),
