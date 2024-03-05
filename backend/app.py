@@ -4,8 +4,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 from urllib.parse import unquote
-from bs4 import BeautifulSoup
-import re
+from fake_useragent import UserAgent
 
 import requests
 import time
@@ -245,39 +244,23 @@ def remove_and_overlay():
     
 
 def fetch_image(webpage_url):
-    try:
-        # Fetch the HTML content of the webpage
-        response = requests.get(webpage_url)
-        html_content = response.text
+    # Create a fake user agent
+    user_agent = UserAgent().random
 
-        # Parse the HTML content using Beautiful Soup
-        soup = BeautifulSoup(html_content, 'html.parser')
+    # Set headers to simulate a web browser
+    headers = {'User-Agent': user_agent}
 
-        # Find all <img> tags
-        img_tags = soup.find_all('img')
+    # Send a GET request to the URL with headers
+    response = requests.get(webpage_url, headers=headers)
 
-        # Extract the source URLs of the images
-        image_urls = [img['src'] for img in img_tags if 'src' in img.attrs]
-
-        # Filter out non-image URLs (optional)
-        image_urls = [url for url in image_urls if re.match(r'^https?://', url)]
-
-        # Fetch the image data for each URL
-        for image_url in image_urls:
-            response = requests.get(image_url)
-            data = response.content
-
-            # Process the image data as needed
-            print("Data Length:", len(data))
-
-            return data
-
-    except requests.exceptions.RequestException as e:
-        print("Error fetching webpage:", e)
-    except Exception as e:
-        print("An error occurred:", e)
-
-    
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Save the content of the response (the image) to a file
+        with open('image.png', 'wb') as f:
+            f.write(response.content)
+        print("Image downloaded successfully.")
+    else:
+        print("Failed to download the image. Status code:", response.status_code)
 
 @app.route("/download_file", methods=["POST"])
 def download_file():
