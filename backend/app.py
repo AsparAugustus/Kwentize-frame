@@ -211,13 +211,21 @@ def remove_and_overlay():
 
         print("Data Length:", len(data))
 
-        background_image_filename = f"background_{now}.{file_extension}"
-        background_image_path = os.path.join("static", background_image_filename)
-        with open(background_image_path, "wb") as f:
-            f.write(data)
+        try:
+            background_image_filename = f"background_{now}.{file_extension}"
+            background_image_path = os.path.join("static", background_image_filename)
+            with open(background_image_path, "wb") as f:
+                f.write(data)
 
-        # Remove background from the provided image
-        background_removed_image_bytes = remove_background_from_image(data)
+            # Remove background from the provided image
+            background_removed_image_bytes = remove_background_from_image(data)
+        except Exception as e:
+            print("Error saving image:", e)
+
+
+
+
+
   
 
         if background_removed_image_bytes is None:
