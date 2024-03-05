@@ -31,15 +31,15 @@ let user = {
 
 export async function POST(req: NextRequest): Promise<Response> {
 
-//   const body: { trustedData?: { messageBytes?: string } } = await req.json();
+  const body: { trustedData?: { messageBytes?: string } } = await req.json();
 
-//   // Check if frame request is valid
-//   const status = await validateFrameRequest(body.trustedData?.messageBytes);
+  // Check if frame request is valid
+  const status = await validateFrameRequest(body.trustedData?.messageBytes);
 
-//   if (!status?.valid) {
-//     console.error(status);
-//     throw new Error('Invalid frame request');
-//   }
+  if (!status?.valid) {
+    console.error(status);
+    throw new Error('Invalid frame request');
+  }
 
   //need to fetch user's
   //1. custody address? verified addresses?
@@ -47,10 +47,10 @@ export async function POST(req: NextRequest): Promise<Response> {
   //3. display_name
   //4. pfp url
 
-//   user.custody_address = status.action.interactor.custody_address
-//   user.username = status.action.interactor.username
-//   user.display_name = status.action.interactor.display_name
-//   user.pfp_url = status.action.interactor.pfp_url
+  user.custody_address = status.action.interactor.custody_address
+  user.username = status.action.interactor.username
+  user.display_name = status.action.interactor.display_name
+  user.pfp_url = status.action.interactor.pfp_url
 
   //follower count? following count?
 
@@ -58,47 +58,44 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   // return getResponse(ResponseType.SUCCESS);
 
-//   const encodedCustodyAddress = user.custody_address !== null ? encodeURIComponent(user.custody_address) : "";
-//   const encodedUsername = user.username !== null ? encodeURIComponent(user.username) : "";
-//   const encodedPfpUrl = user.pfp_url !== null ? encodeURIComponent(user.pfp_url) : "";
-//   const postUrl = `${NEXT_API_URL}/remove_and_overlay?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
+  const encodedCustodyAddress = user.custody_address !== null ? encodeURIComponent(user.custody_address) : "";
+  const encodedUsername = user.username !== null ? encodeURIComponent(user.username) : "";
+  const encodedPfpUrl = user.pfp_url !== null ? encodeURIComponent(user.pfp_url) : "";
+  const postUrl = `${NEXT_API_URL}/remove_and_overlay?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
 
 
     // First POST request to fetch the file content and get the filename
-    // let filename;
-    // axios.post(postUrl)
-    // .then(response => {
-    // // Check if the response is successful
-    // if (response.status === 200) {
-    //     // Extract the filename from the response
-    //     filename = response.data.filename;
+    let filename;
+    axios.post(postUrl)
+    .then(response => {
+    // Check if the response is successful
+    if (response.status === 200) {
+        // Extract the filename from the response
+        filename = response.data.filename;
 
-    //     // Log the filename
-    //     console.log('Filename:', filename);
-    // } else {
-    //     // Handle error responses for the first request
-    //     console.error('Download request failed:', response.statusText);
-    // }
-    // })
-    // .catch(error => {
-    // // Handle Axios errors for the first request
-    // console.error('Axios error:', error);
-    // });
+        // Log the filename
+        console.log('Filename:', filename);
+    } else {
+        // Handle error responses for the first request
+        console.error('Download request failed:', response.statusText);
+    }
+    })
+    .catch(error => {
+    // Handle Axios errors for the first request
+    console.error('Axios error:', error);
+    });
 
   return new NextResponse(
     getFrameHtmlResponse({
       buttons: [
         {
           label: `Download PFP`,
-        },
-        {
-            label: `test PFP`,
         }
       ],
       image: {
-        src: `${NEXT_PUBLIC_URL}/kwentize.png`,
+        src: `${NEXT_API_URL}/static/${filename}`,
       },
-      postUrl: `${NEXT_API_URL}/download_file$filename=`,
+      postUrl: `${NEXT_API_URL}/download_file$filename=${filename}`,
     }),
   );
 
