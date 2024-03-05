@@ -170,53 +170,56 @@ def overlay():
 
 @app.route("/remove_and_overlay", methods=["POST"])
 def remove_and_overlay():
+
     try:
+        json_data = request.json
 
-        content_type = request.headers.get("Content-Type")
-        if content_type == "application/json":
-            json_data = request.json
-            username = json_data.get("username")
-            address = json_data.get("address")
-            if not (username and address):
-                return jsonify({"error": "Username and address must be provided"}), 400
+        address = request.args.get("custody_address")
+        username = request.args.get("username")
+        pfp_url = request.args.get("pfp_url")
 
-            now = str(time.time())
-            url = json_data["url"]
-            file_extension = "png"
-            input_path = f"./origin/{now}.{file_extension}"
-            output_path = f"./static/{username}_{address}_{now}.png"  # Output always as PNG
+        username = json_data.get("username")
+        address = json_data.get("address")
+        if not (username and address):
+            return jsonify({"error": "Username and address must be provided"}), 400
 
-
-            data = requests.get(url).content
-            
+        now = str(time.time())
+        url = json_data["url"]
+        file_extension = "png"
+        input_path = f"./origin/{now}.{file_extension}"
+        output_path = f"./static/{username}_{address}_{now}.png"  # Output always as PNG
 
 
-            background_image_filename = f"background_{now}.{file_extension}"
-            background_image_path = os.path.join("static", background_image_filename)
-            with open(background_image_path, "wb") as f:
-                f.write(data)
+        data = requests.get(pfp_url).content
+        
 
-            # Remove background from the provided image
-            background_removed_image_bytes = remove_background_from_image(data)
-            os.remove(background_image_path)
 
-            if background_removed_image_bytes is None:
-                return jsonify({"error": "Failed to remove background from image"}), 500
+        background_image_filename = f"background_{now}.{file_extension}"
+        background_image_path = os.path.join("static", background_image_filename)
+        with open(background_image_path, "wb") as f:
+            f.write(data)
 
-            # Overlay the background removed image on top of a background
-            result_image_bytes = overlay_images(background_removed_image_bytes)
+        # Remove background from the provided image
+        background_removed_image_bytes = remove_background_from_image(data)
+        os.remove(background_image_path)
 
-            with open(output_path, "wb") as f:
-                f.write(result_image_bytes)
+        if background_removed_image_bytes is None:
+            return jsonify({"error": "Failed to remove background from image"}), 500
 
-            if result_image_bytes is None:
-                return jsonify({"error": "Failed to overlay images"}), 500
+        # Overlay the background removed image on top of a background
+        result_image_bytes = overlay_images(background_removed_image_bytes)
 
-            # # Return the resulting image as a response
-            # return send_file(BytesIO(result_image_bytes), mimetype='image/png')
+        with open(output_path, "wb") as f:
+            f.write(result_image_bytes)
 
-            # Return the filename of the resulting image
-            return jsonify({"filename": output_path})
+        if result_image_bytes is None:
+            return jsonify({"error": "Failed to overlay images"}), 500
+
+        # # Return the resulting image as a response
+        # return send_file(BytesIO(result_image_bytes), mimetype='image/png')
+
+        # Return the filename of the resulting image
+        return jsonify({"filename": output_path})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
