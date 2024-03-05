@@ -310,7 +310,26 @@ def download_file():
                 file_path = os.path.join(static_folder_path, latest_file)
 
                 # Return the file for download
-                return send_file(file_path, as_attachment=True)
+                # return send_file(file_path, as_attachment=True)
+            
+                # Construct HTML content with frame metadata
+                html_content = f"""
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta property="fc:frame" content="vNext" />
+                        <meta property="fc:frame:image" content="http://3.21.66.28/static/{file_path}" />
+                        <meta property="fc:frame:post_url" content="http://3.21.66.28/static/" />
+                    </head>
+                    </html>
+                """
+
+                # Return the HTML content as the response
+                return html_content
+
+
+
+
             else:
                 return jsonify({"error": f"No files found for username '{username}'"}), 404
         else:
