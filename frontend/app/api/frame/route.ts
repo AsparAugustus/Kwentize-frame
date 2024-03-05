@@ -74,7 +74,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       image: {
         src: `${NEXT_PUBLIC_URL}/kwentize.png`,
       },
-      postUrl: `${NEXT_PUBLIC_URL}/relay`,
+      postUrl: `${NEXT_PUBLIC_URL}/api/relay`,
     }),
   );
 
