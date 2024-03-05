@@ -207,13 +207,14 @@ def remove_and_overlay():
 
         # Remove background from the provided image
         background_removed_image_bytes = remove_background_from_image(data)
-        os.remove(background_image_path)
+  
 
         if background_removed_image_bytes is None:
             return jsonify({"error": "Failed to remove background from image"}), 500
 
         # Overlay the background removed image on top of a background
         result_image_bytes = overlay_images(background_removed_image_bytes)
+        os.remove(background_image_path)
 
         with open(output_path, "wb") as f:
             f.write(result_image_bytes)
