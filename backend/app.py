@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, jsonify, send_file, url_for
+from flask import Flask, request, make_response, jsonify, send_file, url_for, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -398,4 +398,8 @@ def overlay_images(foreground_image_bytes, background_path="assets/frame_img.png
     except Exception as e:
         print(f"Error: {e}")
         return None
+    
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
     
