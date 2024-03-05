@@ -189,10 +189,20 @@ def remove_and_overlay():
             return jsonify({"error": "Username and address must be provided"}), 400
 
         now = str(time.time())
+
+        # Filter files matching the username and address
+        matching_files = [file for file in existing_files if file.startswith(f"{username}_{address}")]
+
+        # Calculate the next file number
+        next_file_number = len(matching_files)
+        # Format the file number with leading zeros
+        formatted_file_number = f"{next_file_number:04d}"
+        # Construct the next filename
+        next_filename = f"{username}_{address}_{formatted_file_number}.png"
    
         file_extension = "png"
         input_path = f"./origin/{now}.{file_extension}"
-        output_path = f"./static/{username}_{address}_{now}.png"  # Output always as PNG
+        output_path = f"./static/{next_filename}"  # Output always as PNG
 
         print("Input Path:", input_path)
         print("Output Path:", output_path)
@@ -281,11 +291,11 @@ def download_file():
             # Get the static folder path
             static_folder_path = os.path.join(os.getcwd(), 'static')
 
-            # Find files starting with the username
+         # Find files starting with the username
             matching_files = [file for file in os.listdir(static_folder_path) if file.startswith(username + '_')]
 
-            # Sort the files by timestamp
-            sorted_files = sorted(matching_files, key=lambda x: float(x.split('_')[-1].split('.')[0]), reverse=True)
+            # Sort the files by modification time
+            sorted_files = sorted(matching_files, key=lambda x: os.path.getmtime(os.path.join(static_folder_path, x)), reverse=True)
 
             # Check if any files matched the criteria
             if sorted_files:
