@@ -92,11 +92,12 @@ export async function POST(req: NextRequest): Promise<Response> {
     getFrameHtmlResponse({
       buttons: [
         {
-          label: `Go to download`,
+          label: `Click to download PFP`,
+          target: `${NEXT_API_URL}/download_file$username=${filename}`
         }
       ],
       image: {
-        src: `${NEXT_API_URL}/static/filename`,
+        src: `${NEXT_PUBLIC_URL}/kwentize.png`,
       },
       postUrl: `${NEXT_API_URL}/static/filename`,
     }),
