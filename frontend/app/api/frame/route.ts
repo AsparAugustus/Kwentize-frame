@@ -63,19 +63,18 @@ export async function POST(req: NextRequest): Promise<Response> {
   const encodedCustodyAddress = user.custody_address !== null ? encodeURIComponent(user.custody_address) : "";
   const encodedUsername = user.username !== null ? encodeURIComponent(user.username) : "";
   const encodedPfpUrl = user.pfp_url !== null ? encodeURIComponent(user.pfp_url) : "";
-  const postUrl = `${NEXT_API_URL}/api/frame?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
 
   return new NextResponse(
     getFrameHtmlResponse({
       buttons: [
         {
-          label: `Click to Kwentize your PFP!`,
+          label: `Start conversion!`,
         }
       ],
       image: {
         src: `${NEXT_PUBLIC_URL}/kwentize.png`,
       },
-      postUrl: `${postUrl}`,
+      postUrl: `${NEXT_PUBLIC_URL}/relay`,
     }),
   );
 
