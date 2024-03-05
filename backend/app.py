@@ -223,11 +223,6 @@ def remove_and_overlay():
             print("Error saving image:", e)
 
 
-
-
-
-  
-
         if background_removed_image_bytes is None:
             return jsonify({"error": "Failed to remove background from image"}), 500
 
