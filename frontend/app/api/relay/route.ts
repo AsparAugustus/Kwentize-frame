@@ -61,7 +61,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   const encodedCustodyAddress = user.custody_address !== null ? encodeURIComponent(user.custody_address) : "";
   const encodedUsername = user.username !== null ? encodeURIComponent(user.username) : "";
   const encodedPfpUrl = user.pfp_url !== null ? encodeURIComponent(user.pfp_url) : "";
-  
+
   const postUrl = `${NEXT_API_URL}/remove_and_overlay?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
 
 
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         }
       ],
       image: {
-        src: `${NEXT_API_URL}/static/${filename}`,
+        src: `${NEXT_PUBLIC_URL}/kwentize.png`,
       },
       postUrl: `${NEXT_API_URL}/download_file$filename=${filename}`,
     }),
