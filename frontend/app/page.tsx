@@ -17,7 +17,7 @@ const frameMetadata = getFrameMetadata({
     src: `${NEXT_PUBLIC_URL}/kwentize.png`,
     aspectRatio: '1:1',
   },
-  postUrl: `${NEXT_PUBLIC_URL}/api/frame`,
+  postUrl: `${NEXT_PUBLIC_URL}/api/relay`,
 });
 
 export const metadata: Metadata = {
