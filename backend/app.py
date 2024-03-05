@@ -196,9 +196,12 @@ def remove_and_overlay():
         print("Input Path:", input_path)
         print("Output Path:", output_path)
 
-        response = requests.get(pfp_url)
-        response.raise_for_status()  # Raise an error for bad status codes
-        data = response.content
+        try:
+            response = requests.get(pfp_url)
+            response.raise_for_status()  # Raise an error for bad status codes
+            data = response.content
+        except requests.exceptions.RequestException as e:
+            print("Error fetching image:", e)
 
         print("Data Length:", len(data))
 
