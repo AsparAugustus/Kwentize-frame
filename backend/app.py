@@ -270,6 +270,7 @@ def fetch_image(webpage_url):
 
 @app.route("/download_file", methods=["POST"])
 def download_file():
+    print("tried to download")
     try:
         # Get the username from the POST request data
         username_encoded = request.args.get("username")
