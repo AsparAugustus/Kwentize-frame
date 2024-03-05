@@ -4,6 +4,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 from urllib.parse import unquote
+import urllib.request
 
 import requests
 import time
@@ -196,12 +197,25 @@ def remove_and_overlay():
         print("Input Path:", input_path)
         print("Output Path:", output_path)
 
+        # try:
+        #     response = requests.get(pfp_url)
+        #     response.raise_for_status()  # Raise an error for bad status codes
+        #     data = response.content
+        # except requests.exceptions.RequestException as e:
+        #     print("Error fetching image:", e)
+
         try:
-            response = requests.get(pfp_url)
-            response.raise_for_status()  # Raise an error for bad status codes
-            data = response.content
-        except requests.exceptions.RequestException as e:
+            # Fetch the image data using urllib
+            with urllib.request.urlopen(pfp_url) as response:
+                data = response.read()
+                print("Data Length:", len(data))
+
+                # Continue processing the image data...
+                
+        except urllib.error.HTTPError as e:
             print("Error fetching image:", e)
+        except Exception as e:
+            print("An error occurred:", e)
 
         print("Data Length:", len(data))
 
