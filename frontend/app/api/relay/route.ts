@@ -94,7 +94,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         {
           action: 'link',
           label: `Click to download PFP`,
-          target: `${NEXT_API_URL}/static/${filename}`
+          target: `${NEXT_API_URL}/${filename}`
         }
       ],
       image: {
