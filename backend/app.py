@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+from urllib.parse import unquote
 
 import requests
 import time
@@ -173,9 +174,13 @@ def remove_and_overlay():
 
     try:
  
-        address = request.args.get("custody_address")
-        username = request.args.get("username")
-        pfp_url = request.args.get("pfp_url")
+        address_encoded = request.args.get("custody_address")
+        username_encoded = request.args.get("username")
+        pfp_url_encoded = request.args.get("pfp_url")
+
+        address = unquote(address_encoded)
+        username = unquote(username_encoded)
+        pfp_url = unquote(pfp_url_encoded)
 
         if not (username and address):
             return jsonify({"error": "Username and address must be provided"}), 400
