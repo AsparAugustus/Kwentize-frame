@@ -172,19 +172,16 @@ def overlay():
 def remove_and_overlay():
 
     try:
-        json_data = request.json
-
+ 
         address = request.args.get("custody_address")
         username = request.args.get("username")
         pfp_url = request.args.get("pfp_url")
 
-        username = json_data.get("username")
-        address = json_data.get("address")
         if not (username and address):
             return jsonify({"error": "Username and address must be provided"}), 400
 
         now = str(time.time())
-        url = json_data["url"]
+   
         file_extension = "png"
         input_path = f"./origin/{now}.{file_extension}"
         output_path = f"./static/{username}_{address}_{now}.png"  # Output always as PNG
