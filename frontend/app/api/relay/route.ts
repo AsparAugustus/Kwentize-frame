@@ -85,6 +85,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     console.error('Axios error:', error);
     });
 
+    console.log(filename)
+
   return new NextResponse(
     getFrameHtmlResponse({
       buttons: [
