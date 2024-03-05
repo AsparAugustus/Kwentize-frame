@@ -5,11 +5,11 @@ import { NEXT_PUBLIC_URL } from './config';
 const frameMetadata = getFrameMetadata({
   buttons: [
     {
-      label: 'Kwentize!',
+      label: 'Start Kwentize!',
     },
     {
       action: 'link',
-      label: 'Start trading!',
+      label: 'Start trading',
       target: 'https://kwenta.eth.limo/?ref=kwendroid',
     }
   ],

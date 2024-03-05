@@ -4,6 +4,10 @@ import { NEXT_PUBLIC_URL, NEXT_API_URL } from '../../config';
 import { NeynarAPIClient, isApiErrorResponse } from "@neynar/nodejs-sdk";
 import axios from "axios";
 
+//1st frame goes to frame that generates
+//2nd frame
+//generate pfp, 
+
 enum ResponseType {
   SUCCESS,
   RECAST,
@@ -65,17 +69,11 @@ export async function POST(req: NextRequest): Promise<Response> {
     getFrameHtmlResponse({
       buttons: [
         {
-          label: `${user.custody_address}`,
-        },
-        {
-          label: `${user.display_name}`,
-        },
-        {
-          label: `${user.username}`,
+          label: `Click to Kwentize your PFP!`,
         }
       ],
       image: {
-        src: `${user.pfp_url}`,
+        src: `${NEXT_PUBLIC_URL}/kwentize.png`,
       },
       postUrl: `${postUrl}`,
     }),
@@ -116,7 +114,7 @@ function getResponse(type: ResponseType) {
         image: {
           src: `${user.pfp_url}`,
         },
-        postUrl: `${NEXT_API_URL}/api/frame`,
+        postUrl: `${NEXT_API_URL}/api/generate`,
       }),
     );
 

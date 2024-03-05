@@ -212,8 +212,11 @@ def remove_and_overlay():
             if result_image_bytes is None:
                 return jsonify({"error": "Failed to overlay images"}), 500
 
-            # Return the resulting image as a response
-            return send_file(BytesIO(result_image_bytes), mimetype='image/png')
+            # # Return the resulting image as a response
+            # return send_file(BytesIO(result_image_bytes), mimetype='image/png')
+
+            # Return the filename of the resulting image
+            return jsonify({"filename": output_path})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

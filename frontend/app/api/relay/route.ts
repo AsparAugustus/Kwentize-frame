@@ -4,6 +4,8 @@ import { NEXT_PUBLIC_URL, NEXT_API_URL } from '../../config';
 import { NeynarAPIClient, isApiErrorResponse } from "@neynar/nodejs-sdk";
 import axios from "axios";
 
+//1st frame 
+
 enum ResponseType {
   SUCCESS,
   RECAST,

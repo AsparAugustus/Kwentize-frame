@@ -65,14 +65,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     getFrameHtmlResponse({
       buttons: [
         {
-          label: `${user.custody_address}`,
+          label: `Download your PFP`,
         },
-        {
-          label: `${user.display_name}`,
-        },
-        {
-          label: `${user.username}`,
-        }
       ],
       image: {
         src: `${user.pfp_url}`,
