@@ -90,6 +90,9 @@ export async function POST(req: NextRequest): Promise<Response> {
       buttons: [
         {
           label: `Download PFP`,
+        },
+        {
+            label: `test PFP`,
         }
       ],
       image: {
