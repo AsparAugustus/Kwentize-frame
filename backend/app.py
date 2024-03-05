@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, jsonify, send_file
+from flask import Flask, request, make_response, jsonify, send_file, url_for
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -306,8 +306,8 @@ def download_file():
                 # Get the latest file
                 latest_file = sorted_files[0]
 
-                # Get the full path of the file
-                file_path = os.path.join(static_folder_path, latest_file)
+                # Construct the URL to the file
+                file_url = url_for('static', filename=latest_file)
 
                 # Return the file for download
                 # return send_file(file_path, as_attachment=True)
