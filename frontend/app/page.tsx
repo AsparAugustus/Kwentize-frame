@@ -6,11 +6,6 @@ const frameMetadata = getFrameMetadata({
   buttons: [
     {
       label: 'Start Kwentize!',
-    },
-    {
-      action: 'link',
-      label: 'Start trading',
-      target: 'https://kwenta.eth.limo/?ref=kwendroid',
     }
   ],
   image: {
