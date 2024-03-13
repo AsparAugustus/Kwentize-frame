@@ -403,3 +403,157 @@ def overlay_images(foreground_image_bytes, background_path="assets/frame_img.png
 def serve_static(filename):
     return send_from_directory('static', filename)
     
+def overlay_images_test(foreground_image_bytes, background_path="assets/frame_img.png", mask_path="assets/mask.png"):
+    try:
+        # Open the background image
+        background = Image.open(background_path)
+
+        # Open the mask image
+        mask = Image.open(mask_path)
+
+        # Convert mask to RGBA if it doesn't have alpha channel
+        if mask.mode != 'RGBA':
+            mask = mask.convert('RGBA')
+
+        # Open the foreground image from bytes
+        foreground = Image.open(BytesIO(foreground_image_bytes))
+
+        # Convert foreground to RGBA if it doesn't have alpha channel
+        if foreground.mode != 'RGBA':
+            foreground = foreground.convert('RGBA')
+
+        # Calculate the minimum and maximum height for the foreground image
+        min_height = int(background.height * 0.8)
+        min_width = int(background.width * 0.8)
+
+        # Calculate the maximum width to maintain the aspect ratio
+        max_width = int((foreground.width / foreground.height) * min_height)
+
+        # Ensure the resized width does not exceed the background width
+        max_width = min(max_width, background.width)
+
+        # Resize foreground image while maintaining aspect ratio and fitting within limits
+        foreground.thumbnail((max_width, min_height))
+
+        # Check if the foreground image is smaller than desired
+        if foreground.width < min_width or foreground.height < min_height:
+            # Calculate new dimensions to make the foreground image bigger
+            target_width = min(max_width, min_width)
+            target_height = min(min_height, int((foreground.height / foreground.width) * target_width))
+            foreground = foreground.resize((target_width, target_height))
+
+        # Check if the dimensions of the mask match the dimensions of the foreground image
+        if mask.size != foreground.size:
+            mask = mask.resize(foreground.size)
+
+        # Calculate position to place the foreground image at the center of background
+        x = (background.width - foreground.width) // 2
+        y = (background.height - foreground.height) // 2
+
+        # Paste the foreground image onto the background
+        background.paste(foreground, (x, y), foreground)
+
+        # Return the resulting image bytes
+        with BytesIO() as output_buffer:
+            background.save(output_buffer, format='PNG')
+            return output_buffer.getvalue()
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+    
+@app.route("/remove_and_overlay_test", methods=["POST"])
+def remove_and_overlay_test():
+    try:
+        # address_encoded = request.args.get("custody_address")
+        # username_encoded = request.args.get("username")
+        # pfp_url_encoded = request.args.get("pfp_url")
+
+        # address = unquote(address_encoded)
+        # username = unquote(username_encoded)
+        # pfp_url = unquote(pfp_url_encoded)
+
+        data = request.json
+
+        # Extract parameters from the JSON data
+        address = data.get("custody_address")
+        username = data.get("username")
+        pfp_url = data.get("pfp_url")
+
+        print("Address:", address)
+        print("Username:", username)
+        print("PFP URL:", pfp_url)
+
+        if not (username and address):
+            return jsonify({"error": "Username and address must be provided"}), 400
+
+        now = str(time.time())
+
+
+        # Fetch existing files in the static directory
+        static_folder_path = os.path.join(os.getcwd(), 'static')
+        existing_files = os.listdir(static_folder_path)
+        # Filter files matching the username and address
+        matching_files = [file for file in existing_files if file.startswith(f"{username}_{address}")]
+
+        # Calculate the next file number
+        next_file_number = len(matching_files)
+        # Format the file number with leading zeros
+        formatted_file_number = f"{next_file_number:04d}"
+        # Construct the next filename
+        next_filename = f"{username}_{address}_{formatted_file_number}.png"
+   
+        file_extension = "png"
+        input_path = f"./origin/{now}.{file_extension}"
+        output_path = f"./static/{next_filename}"  # Output always as PNG
+
+        print("Input Path:", input_path)
+        print("Output Path:", output_path)
+
+        # try:
+        #     response = requests.get(pfp_url)
+        #     response.raise_for_status()  # Raise an error for bad status codes
+        #     data = response.content
+        # except requests.exceptions.RequestException as e:
+        #     print("Error fetching image:", e)
+        try:
+
+            data = fetch_image(pfp_url)
+        except Exception as e:
+            print("Error fetching image:", e)
+
+        print("Data Length:", len(data))
+
+        try:
+            background_image_filename = f"background_{now}.{file_extension}"
+            background_image_path = os.path.join("static", background_image_filename)
+            with open(background_image_path, "wb") as f:
+                f.write(data)
+
+            # Remove background from the provided image
+            background_removed_image_bytes = remove_background_from_image(data)
+        except Exception as e:
+            print("Error saving image:", e)
+
+
+        if background_removed_image_bytes is None:
+            return jsonify({"error": "Failed to remove background from image"}), 500
+
+        # Overlay the background removed image on top of a background
+        result_image_bytes = overlay_images_test(background_removed_image_bytes)
+        os.remove(background_image_path)
+
+        with open(output_path, "wb") as f:
+            f.write(result_image_bytes)
+
+        if result_image_bytes is None:
+            return jsonify({"error": "Failed to overlay images"}), 500
+
+        # # Return the resulting image as a response
+        # return send_file(BytesIO(result_image_bytes), mimetype='image/png')
+
+        # Return the filename of the resulting image
+        return jsonify({"filename": output_path})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
