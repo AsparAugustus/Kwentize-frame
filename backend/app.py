@@ -15,6 +15,8 @@ from PIL import Image
 
 import os
 
+from functions.write_to_logs import write_to_logs
+
 
 app = Flask(__name__)
 
@@ -168,18 +170,33 @@ def overlay():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+def extract_params():
+    if request.method == "POST":
+        if request.is_json:
+            data = request.json
+            address = data.get("custody_address")
+            username = data.get("username")
+            pfp_url = data.get("pfp_url")
+        else:
+            address_encoded = request.args.get("custody_address")
+            username_encoded = request.args.get("username")
+            pfp_url_encoded = request.args.get("pfp_url")
+            address = unquote(address_encoded)
+            username = unquote(username_encoded)
+            pfp_url = unquote(pfp_url_encoded)
+    else:
+        return jsonify({"error": "Invalid request method"}), 400
+
+    return address, username, pfp_url
 
 
 @app.route("/remove_and_overlay", methods=["POST"])
 def remove_and_overlay():
     try:
-        address_encoded = request.args.get("custody_address")
-        username_encoded = request.args.get("username")
-        pfp_url_encoded = request.args.get("pfp_url")
-
-        address = unquote(address_encoded)
-        username = unquote(username_encoded)
-        pfp_url = unquote(pfp_url_encoded)
+        
+        address, username, pfp_url = extract_params()
 
         print("Address:", address)
         print("Username:", username)
@@ -253,12 +270,14 @@ def remove_and_overlay():
         # # Return the resulting image as a response
         # return send_file(BytesIO(result_image_bytes), mimetype='image/png')
 
+        # Write to logs
+        write_to_logs(address, username, pfp_url, output_path)
+
         # Return the filename of the resulting image
         return jsonify({"filename": output_path})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
 
 def fetch_image(webpage_url):
     # Create a fake user agent
@@ -372,48 +391,17 @@ def remove_background_from_image(foreground_image_bytes):
         print(f"Error: {e}")
         return None
 
-def overlay_images(foreground_image_bytes, background_path="assets/frame_img.png"):
+def overlay_images(foreground_image_bytes, background_path="assets/frame_img.png", mask_path="assets/mask.png"):
     try:
         # Open the background image
         background = Image.open(background_path)
 
-        # Open the foreground image from bytes
-        foreground = Image.open(BytesIO(foreground_image_bytes))
+        # # Open the mask image
+        # mask = Image.open(mask_path)
 
-        # Resize foreground image to fit background
-        foreground.thumbnail((background.width // 2, background.height // 2))
-
-        # Calculate position to place the foreground image at the center of background
-        x = (background.width - foreground.width) // 2
-        y = (background.height - foreground.height) // 2
-
-        # Paste the foreground image onto the background
-        background.paste(foreground, (x, y), foreground)
-
-        # Return the resulting image bytes
-        with BytesIO() as output_buffer:
-            background.save(output_buffer, format='PNG')
-            return output_buffer.getvalue()
-
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
-    
-@app.route('/static/<path:filename>')
-def serve_static(filename):
-    return send_from_directory('static', filename)
-    
-def overlay_images_test(foreground_image_bytes, background_path="assets/frame_img.png", mask_path="assets/mask.png"):
-    try:
-        # Open the background image
-        background = Image.open(background_path)
-
-        # Open the mask image
-        mask = Image.open(mask_path)
-
-        # Convert mask to RGBA if it doesn't have alpha channel
-        if mask.mode != 'RGBA':
-            mask = mask.convert('RGBA')
+        # # Convert mask to RGBA if it doesn't have alpha channel
+        # if mask.mode != 'RGBA':
+        #     mask = mask.convert('RGBA')
 
         # Open the foreground image from bytes
         foreground = Image.open(BytesIO(foreground_image_bytes))
@@ -442,9 +430,7 @@ def overlay_images_test(foreground_image_bytes, background_path="assets/frame_im
             target_height = min(min_height, int((foreground.height / foreground.width) * target_width))
             foreground = foreground.resize((target_width, target_height))
 
-        # Check if the dimensions of the mask match the dimensions of the foreground image
-        if mask.size != foreground.size:
-            mask = mask.resize(foreground.size)
+ 
 
         # Calculate position to place the foreground image at the center of background
         x = (background.width - foreground.width) // 2
@@ -461,6 +447,10 @@ def overlay_images_test(foreground_image_bytes, background_path="assets/frame_im
     except Exception as e:
         print(f"Error: {e}")
         return None
+    
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
     
 @app.route("/remove_and_overlay_test", methods=["POST"])
 def remove_and_overlay_test():
@@ -540,7 +530,7 @@ def remove_and_overlay_test():
             return jsonify({"error": "Failed to remove background from image"}), 500
 
         # Overlay the background removed image on top of a background
-        result_image_bytes = overlay_images_test(background_removed_image_bytes)
+        result_image_bytes = overlay_images(background_removed_image_bytes)
         os.remove(background_image_path)
 
         with open(output_path, "wb") as f:
