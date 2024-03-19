@@ -81,59 +81,7 @@ def remove_bg():
     else:
         return "Content-Type not supported!"
 
-    
-def overlay_images(foreground_image, background_path="assets/frame_img.png"):
-    try:
-        # Open the background image
-        background = Image.open(background_path)
 
-        # Open the foreground image from bytes
-        foreground = Image.open(BytesIO(foreground_image))
-
-        # Resize foreground image to fit background
-        foreground.thumbnail((background.width // 2, background.height // 2))
-
-        # Calculate position to place the foreground image at the center of background
-        x = (background.width - foreground.width) // 2
-        y = (background.height - foreground.height) // 2
-
-        # Paste the foreground image onto the background
-        background.paste(foreground, (x, y), foreground)
-
-        # Save the result to a BytesIO object
-        output = BytesIO()
-        background.save(output, format='PNG')
-        output.seek(0)
-
-        return output.getvalue()
-
-    except Exception as e:
-        print(f"Overlay Error: {e}")
-        return None
-
-@app.route("/overlay", methods=["POST"])
-def overlay():
-    try:
-        # Check if the request contains a file named 'foreground'
-        if 'foreground' not in request.files:
-            return jsonify({"error": "Foreground image not provided"}), 400
-        
-        # Read the foreground image bytes from the request
-        foreground_image = request.files['foreground'].read()
-
-        # Call overlay_images function to overlay the images
-        result_image_bytes = overlay_images(foreground_image)
-
-        # Check if the overlaying was successful
-        if result_image_bytes is None:
-            return jsonify({"error": "Failed to overlay images"}), 500
-
-        # Return the resulting image as a response
-        return send_file(BytesIO(result_image_bytes), mimetype='image/png')
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
 
 def extract_params():
     if request.method == "POST":
