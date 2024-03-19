@@ -79,7 +79,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     console.log(filename_withoutdot, "filename_withoutdot")
     console.log(`${NEXT_API_URL}${filename_withoutdot}`, "`${NEXT_API_URL}${filename_withoutdot}`")
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 5000));
 
   return new NextResponse(
     getFrameHtmlResponse({
