@@ -72,10 +72,11 @@ export async function POST(req: NextRequest): Promise<Response> {
     const response = await axios.post(postUrl)
   
     filename = response.data.filename
-    console.log(response, "response")
-    console.log(filename, "filename")
+
 
     const filename_withoutdot = filename.substring(1);
+
+    console.log(filename_withoutdot, "filename_withoutdot")
 
     // await new Promise(resolve => setTimeout(resolve, 2000));
 
