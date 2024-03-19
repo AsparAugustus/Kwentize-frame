@@ -62,24 +62,31 @@ export async function POST(req: NextRequest): Promise<Response> {
   const encodedUsername = user.username !== null ? encodeURIComponent(user.username) : "";
   const encodedPfpUrl = user.pfp_url !== null ? encodeURIComponent(user.pfp_url) : "";
 
-  console.log(user.custody_address, user.username, user.display_name, user.pfp_url)
-
   const postUrl = `${NEXT_API_URL}/remove_and_overlay?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
 
 
     // First POST request to fetch the file content and get the filename
     let filename;
-    const response = await axios.post(postUrl)
-  
-    filename = response.data.filename
+    await axios.post(postUrl)
+    .then(response => {
+    // Check if the response is successful
+    if (response.status === 200) {
+        // Extract the filename from the response
+        filename = response.data.filename;
 
+        // Log the filename
+        console.log('Filename:', filename);
+    } else {
+        // Handle error responses for the first request
+        console.error('Download request failed:', response.statusText);
+    }
+    })
+    .catch(error => {
+    // Handle Axios errors for the first request
+    console.error('Axios error:', error);
+    });
 
-    const filename_withoutdot = filename.substring(1);
-
-    console.log(filename_withoutdot, "filename_withoutdot")
-    console.log(`${NEXT_API_URL}${filename_withoutdot}`, "`${NEXT_API_URL}${filename_withoutdot}`")
-
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    console.log(filename)
 
   return new NextResponse(
     getFrameHtmlResponse({
@@ -87,13 +94,13 @@ export async function POST(req: NextRequest): Promise<Response> {
         {
           action: 'link',
           label: `Click to download PFP`,
-          target: `${NEXT_API_URL}${filename_withoutdot}`
+          target: `${NEXT_API_URL}/${filename}`
         }
       ],
       image: {
-        src: `${NEXT_API_URL}${filename_withoutdot}`,
+        src: `${NEXT_PUBLIC_URL}/kwentize_2.png`,
       },
-      postUrl: `${NEXT_API_URL}${filename_withoutdot}`,
+      postUrl: `${NEXT_API_URL}/static/filename`,
     }),
   );
 
