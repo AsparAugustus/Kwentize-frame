@@ -75,7 +75,9 @@ export async function POST(req: NextRequest): Promise<Response> {
     console.log(response, "response")
     console.log(filename, "filename")
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    const filename_withoutdot = filename.substring(1);
+
+    // await new Promise(resolve => setTimeout(resolve, 2000));
 
   return new NextResponse(
     getFrameHtmlResponse({
@@ -83,13 +85,13 @@ export async function POST(req: NextRequest): Promise<Response> {
         {
           action: 'link',
           label: `Click to download PFP`,
-          target: `${NEXT_API_URL}/static/${filename}`
+          target: `${NEXT_API_URL}/static/${filename_withoutdot}`
         }
       ],
       image: {
-        src: `${NEXT_API_URL}/static/${filename}`,
+        src: `${NEXT_API_URL}/static/${filename_withoutdot}`,
       },
-      postUrl: `${NEXT_API_URL}/static/${filename}`,
+      postUrl: `${NEXT_API_URL}/static/${filename_withoutdot}`,
     }),
   );
 
