@@ -104,8 +104,8 @@ def extract_params():
 
 
 @app.route("/remove_and_overlay", methods=["POST"])
-@limiter.limit("4 per day", key_func=lambda: request.json["username"])
 def remove_and_overlay():
+    # @limiter.limit("4 per day", key_func=lambda: request.json["username"])
     try:
         
         address, username, pfp_url = extract_params()
