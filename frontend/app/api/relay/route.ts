@@ -70,7 +70,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     const response = await axios.post(postUrl)
   
     filename = response.data.filename
-    console.log(filename)
+    console.log(response, "response")
+    console.log(filename, "filename")
 
   return new NextResponse(
     getFrameHtmlResponse({
