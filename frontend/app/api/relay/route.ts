@@ -98,9 +98,9 @@ export async function POST(req: NextRequest): Promise<Response> {
         }
       ],
       image: {
-        src: `${NEXT_PUBLIC_URL}/kwentize_2.png`,
+        src: `${NEXT_API_URL}/static/${filename}`,
       },
-      postUrl: `${NEXT_API_URL}/static/filename`,
+      postUrl: `${NEXT_API_URL}/static/${filename}`,
     }),
   );
 
