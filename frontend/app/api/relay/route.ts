@@ -76,6 +76,23 @@ export async function POST(req: NextRequest): Promise<Response> {
 
         // Log the filename
         console.log('Filename:', filename);
+
+        return new NextResponse(
+          getFrameHtmlResponse({
+            buttons: [
+              {
+                action: 'link',
+                label: `Click to download PFP`,
+                target: `${NEXT_API_URL}/${filename}`
+              }
+            ],
+            image: {
+              src: `${NEXT_API_URL}/static/${filename}`,
+            },
+            postUrl: `${NEXT_API_URL}/static/${filename}`,
+          }),
+        );
+      
     } else {
         // Handle error responses for the first request
         console.error('Download request failed:', response.statusText);
@@ -88,21 +105,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     console.log(filename)
 
-  return new NextResponse(
-    getFrameHtmlResponse({
-      buttons: [
-        {
-          action: 'link',
-          label: `Click to download PFP`,
-          target: `${NEXT_API_URL}/${filename}`
-        }
-      ],
-      image: {
-        src: `${NEXT_API_URL}/static/${filename}`,
-      },
-      postUrl: `${NEXT_API_URL}/static/${filename}`,
-    }),
-  );
+  
 
 }
 
