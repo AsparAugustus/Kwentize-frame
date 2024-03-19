@@ -77,6 +77,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     const filename_withoutdot = filename.substring(1);
 
     console.log(filename_withoutdot, "filename_withoutdot")
+    console.log(`${NEXT_API_URL}${filename_withoutdot}`, "`${NEXT_API_URL}${filename_withoutdot}`")
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
