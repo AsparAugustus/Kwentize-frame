@@ -81,43 +81,6 @@ def remove_bg():
     else:
         return "Content-Type not supported!"
 
-
-@app.route("/remove-bg-2", methods=["POST", "OPTIONS"])
-@limiter.limit(
-    "4 per day",
-    key_func=lambda: request.environ.get("HTTP_X_FORWARDED_FOR", request.remote_addr),
-)
-def remove_bg2():
-    content_type = request.headers.get("Content-Type")
-    if content_type == "application/json":
-        json = request.json
-        now = str(time.time())
-        url = json["url"]
-        data = requests.get(url).content
-        f = open("./origin/" + now + ".jpg", "wb")
-        f.write(data)
-        f.close()
-        res = {}
-        res["result"] = now + ".png"
-
-        input_path = "./origin/" + now + ".jpg"
-        output_path = "./static/" + now + ".png"
-
-        response = requests.post(
-            "https://api.remove.bg/v1.0/removebg",
-            files={"image_file": open(input_path, "rb")},
-            data={"size": "auto"},
-            headers={"X-Api-Key": "N7ofK6rsQTtk3oKPbpDM3dV3"},
-        )
-        if response.status_code == requests.codes.ok:
-            with open(output_path, "wb") as out:
-                out.write(response.content)
-                return jsonify(res)
-        else:
-            print("Error:", response.status_code, response.text)
-            return response.text
-    else:
-        return "Content-Type not supported!"
     
 def overlay_images(foreground_image, background_path="assets/frame_img.png"):
     try:
@@ -145,7 +108,7 @@ def overlay_images(foreground_image, background_path="assets/frame_img.png"):
         return output.getvalue()
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Overlay Error: {e}")
         return None
 
 @app.route("/overlay", methods=["POST"])
@@ -193,6 +156,7 @@ def extract_params():
 
 
 @app.route("/remove_and_overlay", methods=["POST"])
+@limiter.limit("4 per day", key_func=lambda: request.json["username"])
 def remove_and_overlay():
     try:
         
@@ -249,7 +213,7 @@ def remove_and_overlay():
                 f.write(data)
 
             # Remove background from the provided image
-            background_removed_image_bytes = remove_background_from_image(data)
+            background_removed_image_bytes = remove_background_using_API(data)
         except Exception as e:
             print("Error saving image:", e)
 
@@ -388,7 +352,36 @@ def remove_background_from_image(foreground_image_bytes):
         return result_image_bytes
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Removebg Error: {e}")
+        return None
+    
+def remove_background_using_API(foreground_image_bytes):
+    try:
+        # API endpoint for removing background
+        api_endpoint = "https://api.removebg.com/v1.0/removebg"
+
+        data = {"size": "auto"} 
+
+        # Prepare headers with API key
+        headers = {
+            'X-Api-Key': "N7ofK6rsQTtk3oKPbpDM3dV3",
+        }
+
+        # Make API request to remove background
+        response = requests.post(api_endpoint,
+                                data = data,
+                                headers=headers,
+                                files={'image_file': ('image.png', foreground_image_bytes)})
+
+        # Check if request was successful
+        if response.status_code == 200:
+            return response.content  # Return the resulting image bytes
+        else:
+            print(f"Failed to remove background. Status code: {response.status_code}")
+            return None
+
+    except Exception as e:
+        print(f"Error occurred while removing background: {e}")
         return None
 
 def overlay_images(foreground_image_bytes, background_path="assets/frame_img.png", mask_path="assets/mask.png"):
@@ -439,13 +432,21 @@ def overlay_images(foreground_image_bytes, background_path="assets/frame_img.png
         # Paste the foreground image onto the background
         background.paste(foreground, (x, y), foreground)
 
+        #use PIL and overlay the image frame_img_bottom.png on top of background
+        kwenta_bottom = Image.open("assets/frame_img_bottom.png")
+        # Ensure transparency is preserved for kwenta_bottom image
+        kwenta_bottom = kwenta_bottom.convert("RGBA")
+
+        background.paste(kwenta_bottom, (0, 0), kwenta_bottom)
+
+
         # Return the resulting image bytes
         with BytesIO() as output_buffer:
             background.save(output_buffer, format='PNG')
             return output_buffer.getvalue()
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"overlay_images Error: {e}")
         return None
     
 @app.route('/static/<path:filename>')
@@ -521,7 +522,7 @@ def remove_and_overlay_test():
                 f.write(data)
 
             # Remove background from the provided image
-            background_removed_image_bytes = remove_background_from_image(data)
+            background_removed_image_bytes = remove_background_using_API(data)
         except Exception as e:
             print("Error saving image:", e)
 
@@ -530,6 +531,7 @@ def remove_and_overlay_test():
             return jsonify({"error": "Failed to remove background from image"}), 500
 
         # Overlay the background removed image on top of a background
+   
         result_image_bytes = overlay_images(background_removed_image_bytes)
         os.remove(background_image_path)
 

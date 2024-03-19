@@ -1,1 +1,16 @@
 .vscode
+# Flask related
+/__pycache__/
+/*.pyc
+
+# Virtual environment
+/venv/
+
+/static
+/origin
+
+# Database
+/logs.db
+
+# Environment variables
+.env
