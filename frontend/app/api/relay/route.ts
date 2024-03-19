@@ -75,6 +75,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     console.log(response, "response")
     console.log(filename, "filename")
 
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
   return new NextResponse(
     getFrameHtmlResponse({
       buttons: [
