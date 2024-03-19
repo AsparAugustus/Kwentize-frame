@@ -62,6 +62,8 @@ export async function POST(req: NextRequest): Promise<Response> {
   const encodedUsername = user.username !== null ? encodeURIComponent(user.username) : "";
   const encodedPfpUrl = user.pfp_url !== null ? encodeURIComponent(user.pfp_url) : "";
 
+  console.log(user.custody_address, user.username, user.display_name, user.pfp_url)
+
   const postUrl = `${NEXT_API_URL}/remove_and_overlay?custody_address=${encodedCustodyAddress}&username=${encodedUsername}&pfp_url=${encodedPfpUrl}`;
 
 
