@@ -1,6 +1,7 @@
 import { getFrameMetadata } from '@coinbase/onchainkit/frame';
 import type { Metadata } from 'next';
 import { NEXT_PUBLIC_URL } from './config';
+import { Analytics } from "@vercel/analytics/react"
 
 const frameMetadata = getFrameMetadata({
   buttons: [
@@ -31,6 +32,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
+    <Analytics />
       <h1>https://github.com/AsparAugustus</h1>
     </>
   );
